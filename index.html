@@ -1,21 +1,602 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Zeus IFA 2026</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif; color: #111827; background:#ffffff; }
-      a { color: inherit; text-decoration: none; }
-      button { cursor: pointer; }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeus | IFA 2026 Berlin - K-Tech Innovation</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & Babel CDNs (Stable Versions) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-      .container { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
-      .nav { position: fixed; top:0; left:0; right:0; height:64px; background:rgba(255,255,255,0.9); backdrop-filter:blur(10px); border-bottom:1px solid #e5e7eb; display:flex; align-items:center; }
-      .nav-inner { display:flex; align-items:center; justify-content:space-between; width:100%; }
-      .nav-logo { display:flex; align-items:center; gap:8px; font-weight:900; color:#1d4ed8; text-transform:uppercase; }
-      .nav-logo-icon { width:32px; height:32px; background:#2563eb; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-style:italic; }
-      .nav-menu { display:flex; gap:24px; font-size:12px; font-weight:700; color:#6b7280; }
-      .nav-menu button { background:none; border:none; }
-      .nav-menu button:hover { color:#2563eb; }
-      .nav-cta { backgr
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Prevent flash of unstyled content */
+        [v-cloak] { display: none; }
+        
+        #root:empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #f8fafc;
+        }
+
+        #root:empty::after {
+            content: "Loading Zeus Experience...";
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            color: #2563eb;
+            font-size: 1.5rem;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 초기 렌더링 대기용 컨테이너 -->
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- [필수] 구글 앱스 스크립트 새 배포 후 발급받은 웹 앱 URL을 아래 따옴표 안에 꼭 넣어주세요! ---
+        const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+
+        // --- 최적화된 고해상도 Pure SVG 아이콘 ---
+        const GlobalIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        );
+
+        const CalendarIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        );
+
+        const MapPinIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        );
+
+        const ZapIcon = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        );
+
+        const MonitorIcon = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        );
+
+        const SettingsIcon = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33 1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82 1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        );
+
+        const SmartphoneIcon = ({ size = 24 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        );
+
+        const ArrowRightIcon = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        );
+
+        const StarIcon = () => (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        );
+
+        const App = () => {
+            const [formData, setFormData] = useState({
+                type: 'buyer',
+                name: '',
+                company: '',
+                email: '',
+                date: '',
+                interest: 'DLP Mini Beam',
+                message: ''
+            });
+            const [isSubmitting, setIsSubmitting] = useState(false);
+            const [isSubmitted, setIsSubmitted] = useState(false);
+            const [submitError, setSubmitError] = useState(null);
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setIsSubmitting(true);
+                setSubmitError(null);
+
+                // 구글 앱스 스크립트 URL 미설정 시 디버그 모드로 동작 (가상 성공 처리)
+                if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL" || !GOOGLE_SCRIPT_URL) {
+                    console.warn("GOOGLE_SCRIPT_URL이 설정되지 않아 로컬 테스트 시뮬레이션으로 전송을 대체합니다.");
+                    setTimeout(() => {
+                        setIsSubmitting(false);
+                        setIsSubmitted(true);
+                        setTimeout(() => setIsSubmitted(false), 8000);
+                    }, 1200);
+                    return;
+                }
+
+                try {
+                    // CORS preflight 검사를 우회하기 위해 text/plain 타입으로 데이터를 래핑하여 전송합니다.
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors', 
+                        headers: {
+                            'Content-Type': 'text/plain;charset=utf-8',
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    setIsSubmitting(false);
+                    setIsSubmitted(true);
+                    
+                    // 입력 필드 리셋 (단, 바이어/게스트 분류 상태는 유지)
+                    setFormData({
+                        type: formData.type,
+                        name: '',
+                        company: '',
+                        email: '',
+                        date: '',
+                        interest: 'DLP Mini Beam',
+                        message: ''
+                    });
+
+                    // 8초 후 완료 팝업 초기화
+                    setTimeout(() => setIsSubmitted(false), 8000);
+                } catch (error) {
+                    console.error("데이터 전송 오류:", error);
+                    setSubmitError("Failed to submit request. Please check your network connection.");
+                    setIsSubmitting(false);
+                }
+            };
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: value
+                }));
+            };
+
+            const scrollToSection = (id) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-white font-sans text-gray-900 w-full overflow-x-hidden">
+                    {/* 상단 네비게이션 */}
+                    <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm z-50 border-b border-gray-100">
+                        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-black italic">Z</div>
+                                <span className="text-xl font-black text-blue-900 tracking-tighter uppercase">Zeus</span>
+                            </div>
+                            <div className="hidden md:flex gap-8 text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                                <button onClick={() => scrollToSection('benefits')} className="hover:text-blue-600 transition">Benefits</button>
+                                <button onClick={() => scrollToSection('lineup')} className="hover:text-blue-600 transition">Lineup</button>
+                                <button onClick={() => scrollToSection('proof')} className="hover:text-blue-600 transition">Proven</button>
+                                <button onClick={() => scrollToSection('info')} className="hover:text-blue-600 transition">Exhibition</button>
+                            </div>
+                            <button 
+                                onClick={() => scrollToSection('reserve')}
+                                className="bg-blue-600 text-white px-6 py-2 rounded-full text-[10px] font-black uppercase shadow-lg shadow-blue-200 transition-colors hover:bg-blue-700"
+                            >
+                                IFA 2026 RSVP
+                            </button>
+                        </div>
+                    </nav>
+
+                    {/* 히어로 섹션 */}
+                    <section className="pt-32 pb-24 md:pt-56 md:pb-48 bg-gradient-to-b from-white to-blue-50/20 flex items-center justify-center">
+                        <div className="max-w-4xl mx-auto px-4 md:px-6 text-center space-y-10 animate-fade-in-up">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-[12px] font-black uppercase tracking-widest mx-auto">
+                                <GlobalIcon /> IFA 2026 · Berlin · Hall 3.2
+                            </div>
+                            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-tight tracking-tighter">
+                                Ready to <br/>Replace Your TV? <br/>
+                                <span className="text-blue-600">Zeus Projector</span>
+                            </h1>
+                            <p className="text-lg md:text-2xl text-gray-500 max-w-3xl mx-auto font-medium leading-relaxed">
+                                Experience the pinnacle of K-Tech innovation for global buyers. <br className="hidden md:block"/>
+                                Ultra-efficient power management and Android 13 integration. 
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-6 justify-center pt-4">
+                                <button 
+                                    onClick={() => scrollToSection('reserve')}
+                                    className="px-10 py-5 bg-blue-600 text-white rounded-2xl font-black text-lg uppercase tracking-widest hover:bg-blue-700 shadow-2xl shadow-blue-200 flex items-center justify-center gap-3 transition-transform hover:scale-105"
+                                >
+                                    B2B PARTNERSHIP <ArrowRightIcon />
+                                </button>
+                                <button 
+                                    onClick={() => scrollToSection('reserve')}
+                                    className="px-10 py-5 bg-white border-2 border-gray-200 text-gray-900 rounded-2xl font-black text-lg uppercase tracking-widest hover:border-blue-300 transition-transform hover:scale-105"
+                                >
+                                    BOOK LIVE DEMO
+                                </button>
+                            </div>
+                            <div className="flex justify-center items-center gap-8 pt-10">
+                                <div className="text-center">
+                                    <p className="text-3xl font-black text-blue-600 tracking-tighter italic">95%</p>
+                                    <p className="text-[10px] text-gray-400 font-black uppercase">Sold Out</p>
+                                </div>
+                                <div className="w-px h-12 bg-gray-200" />
+                                <div className="text-center">
+                                    <p className="text-3xl font-black text-blue-600 tracking-tighter italic">4.9/5</p>
+                                    <p className="text-[10px] text-gray-400 font-black uppercase">User Rating</p>
+                                </div>
+                                <div className="w-px h-12 bg-gray-200" />
+                                <div className="text-center">
+                                    <p className="text-3xl font-black text-blue-600 tracking-tighter italic">K-Tech</p>
+                                    <p className="text-[10px] text-gray-400 font-black uppercase">Origin</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* 핵심 강점 섹션 */}
+                    <section id="benefits" className="py-20 md:py-32 border-t border-gray-50">
+                        <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
+                            <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-12 md:mb-20 underline decoration-blue-600 decoration-8 underline-offset-[12px]">Core Advantages</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
+                                {[
+                                    { Icon: ZapIcon, title: "Ultra Efficient", desc: "Energy-saving technology optimized for sustainability." },
+                                    { Icon: MonitorIcon, title: "Android 13 Native", desc: "Seamless integration with global streaming platforms." },
+                                    { Icon: SettingsIcon, title: "Auto-Control", desc: "Intelligent auto-focus and keystone correction." },
+                                    { Icon: SmartphoneIcon, title: "Connected", desc: "Wi-Fi 6 and Bluetooth 5.0 for low-latency streaming." }
+                                ].map((item, i) => (
+                                    <div key={i} className="p-8 md:p-10 bg-gray-50 rounded-[32px] hover:bg-white hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-gray-100 text-left group">
+                                        <div className="w-14 h-14 md:w-16 md:h-16 bg-white rounded-2xl flex items-center justify-center mb-6 md:mb-8 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                            <item.Icon size={28} />
+                                        </div>
+                                        <h4 className="text-lg md:text-xl font-black uppercase tracking-tight mb-4">{item.title}</h4>
+                                        <p className="text-gray-500 text-sm font-medium leading-relaxed">{item.desc}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* 제품 라인업 섹션 (DLP / LCD 이원화 구성) */}
+                    <section id="lineup" className="py-20 md:py-32 bg-gray-50 border-t border-gray-100">
+                        <div className="max-w-7xl mx-auto px-4 md:px-6">
+                            <div className="text-center max-w-3xl mx-auto mb-16 md:mb-24">
+                                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-6">
+                                    Product Lineup
+                                </h2>
+                                <p className="text-lg text-gray-500 font-medium leading-relaxed">
+                                    글로벌 디바이스 트렌드에 대응하여 엄선된 Zeus의 핵심 기술 플랫폼 라인업입니다.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                                {/* DLP Mini Beam */}
+                                <div className="bg-white rounded-[32px] border border-gray-100 p-8 md:p-10 flex flex-col justify-between hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                                    <div>
+                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-black uppercase tracking-wider mb-6">
+                                            🏕️ Portable & High-Contrast
+                                        </div>
+                                        <h3 className="text-3xl font-black text-gray-900 mb-2">DLP Mini Beam</h3>
+                                        <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-6">Digital Light Processing Platform</p>
+                                        
+                                        <p className="text-gray-600 text-sm leading-relaxed mb-8">
+                                            미세 거울 어레이를 이용한 초고대비 하드웨어 광학 기술을 채택하여, 야외 및 거친 조도 환경에서도 왜곡 없는 트루 블랙 화질을 제공하는 아웃도어 특화 모바일 빔프로젝터입니다.
+                                        </p>
+
+                                        <div className="space-y-4 mb-8 border-t border-gray-100 pt-6">
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-gray-400 font-bold uppercase">Optical Engine</span>
+                                                <span className="text-gray-900 font-black">Texas Instruments DLP®</span>
+                                            </div>
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-gray-400 font-bold uppercase">Contrast Ratio</span>
+                                                <span className="text-gray-900 font-black">150,000:1 Dynamic Contrast</span>
+                                            </div>
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-gray-400 font-bold uppercase">Mobility</span>
+                                                <span className="text-gray-900 font-black">Built-in Battery & Compact Form</span>
+                                            </div>
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-gray-400 font-bold uppercase">Smart Logic</span>
+                                                <span className="text-gray-900 font-black">Auto Focus / 4D Auto Keystone</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button 
+                                        onClick={() => {
+                                            setFormData(prev => ({ ...prev, interest: 'DLP Mini Beam' }));
+                                            scrollToSection('reserve');
+                                        }}
+                                        className="w-full py-4 bg-gray-50 hover:bg-blue-600 hover:text-white text-gray-900 rounded-2xl font-black text-xs uppercase tracking-widest transition-all"
+                                    >
+                                        Inquire For DLP Mini Beam
+                                    </button>
+                                </div>
+
+                                {/* LCD Smart Beam */}
+                                <div className="bg-white rounded-[32px] border-2 border-blue-600 p-8 md:p-10 flex flex-col justify-between shadow-2xl relative hover:-translate-y-2 transition-all duration-500">
+                                    <div className="absolute top-0 right-10 -translate-y-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                                        Best Seller
+                                    </div>
+                                    <div>
+                                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] font-black uppercase tracking-wider mb-6">
+                                            🎬 Native FHD & Home Cinema
+                                        </div>
+                                        <h3 className="text-3xl font-black text-gray-900 mb-2">LCD Smart Beam</h3>
+                                        <p className="text-blue-600 text-xs font-black uppercase tracking-wider mb-6">High Brightness Smart Platform</p>
+                                        
+                                        <p className="text-gray-600 text-sm leading-relaxed mb-8">
+                                            Native Full HD 고정밀 디스플레이 광원을 활용해 밝기(ANSI 루멘)와 가격 경쟁력을 동시에 극대화했습니다. 넷플릭스 공식 인증 등 완벽한 스마트 OTT 연동을 보장하는 스마트 홈시네마 모델입니다.
+                                        </p>
+
+                                        <div className="space-y-4 mb-8 border-t border-gray-100 pt-6">
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-gray-400 font-bold uppercase">Brightness</span>
+                                                <span className="text-blue-600 font-black">230 Real ANSI Lumens</span>
+                                            </div>
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-gray-400 font-bold uppercase">Resolution</span>
+                                                <span className="text-gray-900 font-black">Native FHD 1080P Support</span>
+                                            </div>
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-gray-400 font-bold uppercase">Smart OS</span>
+                                                <span className="text-gray-900 font-black">Native Android 13 Integration</span>
+                                            </div>
+                                            <div className="flex justify-between text-xs">
+                                                <span className="text-gray-400 font-bold uppercase">Connectivity</span>
+                                                <span className="text-gray-900 font-black">Wi-Fi 6 / Bluetooth 5.0 Dual</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button 
+                                        onClick={() => {
+                                            setFormData(prev => ({ ...prev, interest: 'LCD Smart Beam' }));
+                                            scrollToSection('reserve');
+                                        }}
+                                        className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-200"
+                                    >
+                                        Request LCD Smart Beam Demo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* 실적 검증 섹션 */}
+                    <section id="proof" className="py-20 px-4 md:px-6">
+                        <div className="max-w-7xl mx-auto bg-blue-900 rounded-[30px] md:rounded-[50px] p-8 md:p-24 text-white relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/30 blur-[120px] rounded-full" />
+                            <div className="relative z-10 grid lg:grid-cols-3 gap-12 md:gap-16 items-center">
+                                <div className="lg:col-span-1 text-left">
+                                    <h2 className="text-4xl md:text-5xl font-black italic tracking-tighter leading-none mb-6 md:mb-8">PROVEN IN <br/>SOUTH KOREA</h2>
+                                    <p className="text-blue-200 font-bold uppercase tracking-widest text-xs md:text-sm">Now scaling globally at IFA</p>
+                                </div>
+                                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                                    <div className="p-6 md:p-8 bg-white/5 backdrop-blur-md rounded-2xl md:rounded-3xl border border-white/10">
+                                        <div className="flex gap-1 text-yellow-400 mb-4 md:mb-6">
+                                            {[...Array(5)].map((_, i) => <StarIcon key={i} />)}
+                                        </div>
+                                        <p className="text-base md:text-lg font-bold italic mb-6">"Revolutionary image quality at this price point. A must-have for home cinema."</p>
+                                        <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Tech Reviewer @Seoul</p>
+                                    </div>
+                                    <div className="p-6 md:p-8 bg-white/5 backdrop-blur-md rounded-2xl md:rounded-3xl border border-white/10">
+                                        <div className="flex gap-1 text-yellow-400 mb-4 md:mb-6">
+                                            {[...Array(5)].map((_, i) => <StarIcon key={i} />)}
+                                        </div>
+                                        <p className="text-base md:text-lg font-bold italic mb-6">"Low power usage and high brightness make it perfect for our cafe lounge."</p>
+                                        <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Business Partner B</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* 오프라인 전시 상세 & 예약 폼 섹션 */}
+                    <section id="info" className="py-20 md:py-32">
+                        <div className="max-w-7xl mx-auto px-4 md:px-6 grid lg:grid-cols-2 gap-16 md:gap-24 items-start text-left">
+                            <div>
+                                <h2 className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-8 md:mb-12">IFA 2026 <br/>Berlin Presence</h2>
+                                <div className="space-y-6 md:space-y-8">
+                                    <div className="flex gap-6 items-start">
+                                        <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
+                                            <CalendarIcon />
+                                        </div>
+                                        <div>
+                                            <h5 className="font-black uppercase text-xs tracking-widest text-gray-400 mb-1">Duration</h5>
+                                            <p className="text-lg md:text-xl font-bold">Sept 4 – 8, 2026</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-6 items-start">
+                                        <div className="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-200">
+                                            <MapPinIcon />
+                                        </div>
+                                        <div>
+                                            <h5 className="font-black uppercase text-xs tracking-widest text-gray-400 mb-1">Location</h5>
+                                            <p className="text-xl md:text-2xl font-black text-blue-900 tracking-tight">Hall 3.2 · Booth 123</p>
+                                            <p className="text-xs md:text-sm font-bold text-gray-500 uppercase">Messe Berlin, Germany</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="mt-12 md:mt-16 pt-12 md:pt-16 border-t border-gray-100">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600 mb-6">Exclusive On-Site Benefits</p>
+                                    <ul className="space-y-4">
+                                        {['Direct B2B Wholesale Pricing', 'IFA Limited Edition Bundles', 'Post-Exhibition Priority Lead'].map((item, i) => (
+                                            <li key={i} className="flex items-center gap-3 font-black text-[10px] md:text-xs uppercase italic">
+                                                <div className="w-2 h-2 bg-blue-600 rounded-full" /> {item}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div id="reserve" className="bg-white border border-gray-100 rounded-[30px] md:rounded-[50px] shadow-2xl p-8 md:p-16 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 -mr-16 -mt-16 rounded-full" />
+                                <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight mb-8 md:mb-10">RSVP Meeting</h3>
+                                
+                                {isSubmitted ? (
+                                    <div className="py-24 text-center">
+                                        <div className="w-16 h-16 md:w-20 md:h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8">
+                                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
+                                        </div>
+                                        <h4 className="text-xl md:text-2xl font-black text-green-600 uppercase">예약이 완료되었습니다!</h4>
+                                        <p className="text-gray-500 font-bold mt-2">등록해주신 이메일로 곧 안내 메일이 발송됩니다.</p>
+                                    </div>
+                                ) : (
+                                    <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
+                                        <div className="flex gap-2 p-1.5 bg-gray-100 rounded-2xl mb-6">
+                                            <button 
+                                                type="button" 
+                                                onClick={() => setFormData({...formData, type: 'buyer'})}
+                                                className={`flex-1 py-3 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all ${formData.type === 'buyer' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}
+                                            >
+                                                B2B Partner
+                                            </button>
+                                            <button 
+                                                type="button"
+                                                onClick={() => setFormData({...formData, type: 'visitor'})}
+                                                className={`flex-1 py-3 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all ${formData.type === 'visitor' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-400'}`}
+                                            >
+                                                Guest Demo
+                                            </button>
+                                        </div>
+                                        <input 
+                                            type="text" 
+                                            name="name"
+                                            required 
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            placeholder="이름 (Full Name)" 
+                                            className="w-full px-5 py-4 bg-gray-50 border-none rounded-xl md:rounded-2xl focus:ring-2 focus:ring-blue-600 font-bold text-sm"
+                                        />
+                                        <input 
+                                            type="text" 
+                                            name="company"
+                                            value={formData.company}
+                                            onChange={handleChange}
+                                            placeholder="회사명 (Company Name - B2B 필수)" 
+                                            className="w-full px-5 py-4 bg-gray-50 border-none rounded-xl md:rounded-2xl focus:ring-2 focus:ring-blue-600 font-bold text-sm"
+                                        />
+                                        <input 
+                                            type="email" 
+                                            name="email"
+                                            required 
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            placeholder="이메일 주소 (Business Email)" 
+                                            className="w-full px-5 py-4 bg-gray-50 border-none rounded-xl md:rounded-2xl focus:ring-2 focus:ring-blue-600 font-bold text-sm"
+                                        />
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <select 
+                                                name="date"
+                                                required 
+                                                value={formData.date}
+                                                onChange={handleChange}
+                                                className="w-full px-5 py-4 bg-gray-50 border-none rounded-xl md:rounded-2xl focus:ring-2 focus:ring-blue-600 font-black uppercase text-[10px] tracking-widest"
+                                            >
+                                                <option value="">방문 예정일 선택</option>
+                                                <option value="Sept 4 (Fri)">Sept 4 (Fri)</option>
+                                                <option value="Sept 5 (Sat)">Sept 5 (Sat)</option>
+                                                <option value="Sept 6 (Sun)">Sept 6 (Sun)</option>
+                                                <option value="Sept 7 (Mon)">Sept 7 (Mon)</option>
+                                                <option value="Sept 8 (Tue)">Sept 8 (Tue)</option>
+                                            </select>
+                                            <select 
+                                                name="interest"
+                                                required 
+                                                value={formData.interest}
+                                                onChange={handleChange}
+                                                className="w-full px-5 py-4 bg-gray-50 border-none rounded-xl md:rounded-2xl focus:ring-2 focus:ring-blue-600 font-black uppercase text-[10px] tracking-widest"
+                                            >
+                                                <option value="DLP Mini Beam">DLP Mini Beam</option>
+                                                <option value="LCD Smart Beam">LCD Smart Beam</option>
+                                            </select>
+                                        </div>
+
+                                        <textarea 
+                                            name="message"
+                                            value={formData.message}
+                                            onChange={handleChange}
+                                            placeholder="기타 요청사항이나 사업 제안 내용을 입력하세요." 
+                                            rows="3"
+                                            className="w-full px-5 py-4 bg-gray-50 border-none rounded-xl md:rounded-2xl focus:ring-2 focus:ring-blue-600 font-bold text-sm"
+                                        ></textarea>
+
+                                        {submitError && (
+                                            <p className="text-red-500 text-xs font-bold text-center">{submitError}</p>
+                                        )}
+
+                                        <button 
+                                            type="submit" 
+                                            disabled={isSubmitting}
+                                            className={`w-full py-4 md:py-5 text-white rounded-xl md:rounded-2xl font-black uppercase tracking-[0.2em] transition-colors shadow-xl shadow-blue-100 flex items-center justify-center ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-black'}`}
+                                        >
+                                            {isSubmitting ? '전송 중 (Submitting...)' : 'Confirm RSVP'}
+                                        </button>
+                                    </form>
+                                )}
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* 푸터 섹션 */}
+                    <footer className="py-16 md:py-20 bg-gray-50 border-t border-gray-100">
+                        <div className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col md:flex-row justify-between items-center gap-10">
+                            <div className="text-left">
+                                <div className="flex items-center gap-2 mb-6">
+                                    <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white font-bold italic text-xs">Z</div>
+                                    <span className="text-lg font-black tracking-tighter text-blue-900 uppercase">Zeus</span>
+                                </div>
+                                <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">© 2026 ZEUS BEAM PROJECTOR. DESIGNED IN SEOUL, KOREA.</p>
+                            </div>
+                            <div className="flex gap-8 md:gap-12 text-[9px] font-black uppercase tracking-widest text-gray-500">
+                                <button className="hover:text-blue-600 transition-colors">Privacy</button>
+                                <button className="hover:text-blue-600 transition-colors">Terms</button>
+                                <button className="hover:text-blue-600 transition-colors">Global Sales</button>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        // Initialize the app with safe check
+        const renderApp = () => {
+            const rootElement = document.getElementById('root');
+            if (rootElement) {
+                const root = ReactDOM.createRoot(rootElement);
+                root.render(<App />);
+            }
+        };
+
+        // Execute render on DOM content loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderApp);
+        } else {
+            renderApp();
+        }
+    </script>
+</body>
+</html>
